@@ -88,31 +88,34 @@ const tolist = (str) => {
   return ret + 'LLT'
 }
 
-const fromlist = (str) => {
-  console.assert(str[0] === 'L')
-  if (str[1] === 'L') {
-    console.assert(str[2] === 'T')
-    console.assert(str.length === 3)
-    return ''
-  }
-  if (str[1] === 'A') {
-    console.assert(str[2] === 'A')
-    console.assert(str[3] === 'T')
+const prepareOutput = (retexp, retenv) => {
+  let ret = ''
 
-    console.assert(str.slice(4, 8) === 'LLLL')
+  let expStr = stringify(retexp)
+  let env = retenv
+  while (expStr !== 'LLT') {
+    const selectFirst = 'A' + expStr + 'LLST'
+    const selectSecond = 'A' + expStr + 'LLT'
 
-    if (str[8] === 'T') return 'T' + fromlist(str.slice(9))
-    else if (str[8] === 'S') {
-      if (str[9] === 'T') return 'S' + fromlist(str.slice(10))
-      else if (str[9] === 'S') {
-        if (str[10] === 'T') return 'A' + fromlist(str.slice(11))
-        else if (str[10] === 'S') {
-          if (str[11] === 'T') return 'L' + fromlist(str.slice(12))
-        }
-      }
+    const [firstExp, firstEnv] = exec(parse1(selectFirst), [], env)
+
+    const firstStr = stringify(firstExp)
+
+    if (firstStr === 'LLLLT') ret += 'T'
+    else if (firstStr === 'LLLLST') ret += 'S'
+    else if (firstStr === 'LLLLSST') ret += 'A'
+    else if (firstStr === 'LLLLSSST') ret += 'L'
+    else {
+      console.error(firstStr, firstEnv)
+      throw Error('oops' + firstStr)
     }
+
+    const [secondExp, secondEnv] = exec(parse1(selectSecond), [], env)
+    expStr = stringify(secondExp)
+    env = secondEnv
   }
-  throw Error('boom')
+
+  return ret
 }
 
 export const execWithIo = (str) => {
@@ -123,8 +126,8 @@ export const execWithIo = (str) => {
   const args = [[list, []], []]
 
   const [retexp, retenv] = exec(exp, args, [])
-  
-  return fromlist(stringify(retexp))
+
+  return prepareOutput(retexp, retenv)
 }
 
 //

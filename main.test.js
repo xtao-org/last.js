@@ -59,3 +59,8 @@ for (const [expected, input] of cases) {
   const actual = stringify(sDeoptimize(parse1(input)))
   console.assert(actual === expected, '\nexpected', expected, '\nactual  ', actual)
 }
+
+
+const makeOutput = `L A A LALASTATTLASTATT LL AA T L LAAT LLLLT A SSST ST LLT A LLLASTSST LLT`
+
+console.assert(execWithIo(sanitize(makeOutput)) === 'T')

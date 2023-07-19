@@ -303,9 +303,6 @@ export const sDeoptimize = (exp) => {
 
     return [first, [sDeoptimize(wrap(a, pre)), sDeoptimize(wrap(b, pre))]]
   }
-  // else if (first === 'S') {
-  //   return getRefs(second, l, s + 1)
-  // }
   else if (first === 'T') {
     return exp
   }

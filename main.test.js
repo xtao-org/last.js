@@ -7,31 +7,28 @@ self-interpreter:
 ALATTLALLLATSLAAAATSASTLASTLLASSTLAATSTSSTSASTLASS
 TLASSTLAASSTTASTTSASTLASTLASTATLLTSATLATLLSTATT
 
-continuation:
-LLT
+continuation*:
+LAT ALATTLATT
 
 input program:
 LT
 
 input for the program:
-TALLATLAS`, `TALLATLAS`],
+TALLATLAS
+
+* note: the continuation starts the input program, 
+providing it with the initial environment;
+here we provide an infinite loop as the initial environment;
+this is so that if the input program ever tries to reference a free variable,
+the self-interpreter will loop forever and crash the browser tab;
+this is a crude way of indicating an error
+`, `TALLATLAS`],
 ]
-
-
 
 for (const [, input, expected] of examples) {
   const actual = execWithIo(sanitize(input))
   console.assert(actual === expected, '\nexpected', expected, '\nactual  ', actual)
 }
-
-// lastbButton.onclick = () => {
-//   setTimeout(() => {
-//     const inp = sanitize(inputArea.value)
-//     const bininp = toBin(inp)
-//     const binout = toBin(execWithIo(inp))
-//     outputArea.innerHTML = `input as binary:<br/>${bininp}<br/>output as binary:<br/>${binout}`
-//   }, 150)
-// }
 
 const cases = [
   [`LLLASSTT`, `LLSLASTT`],

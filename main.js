@@ -1,4 +1,4 @@
-// Copyright (c) 2022 Dariusz Jędrzejczak
+// Copyright (c) 2023 Dariusz Jędrzejczak
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -109,30 +109,76 @@ const tolist = (str) => {
   return ret + 'LLT'
 }
 
+const makeArgs = (...args) => {
+  let ret = []
+  for (const a of args) {
+    ret = [a, ret]
+  }
+  return ret
+}
+
+// todo: optimize maybe
 const prepareOutput = (retexp, retenv) => {
   let ret = ''
 
-  let expStr = stringify(retexp)
+  let exp = retexp
   let env = retenv
-  while (expStr !== 'LLT') {
-    const selectFirst = 'A' + expStr + 'LLST'
-    const selectSecond = 'A' + expStr + 'LLT'
 
-    const [firstExp, firstEnv] = exec(parse1(selectFirst), [], env)
+  // todo: all these exps could be extracted to global/iife scope
+  const expDummy0 = parse1('LT')
+  const expDummy1 = parse1('LT')
+  const expT = parse1('LT')
+  const expS = parse1('LT')
+  const expA = parse1('LT')
+  const expL = parse1('LT')
+  const expSelectFirst = parse1('LLST')
+  const expSelectSecond = parse1('LLT')
 
-    const firstStr = stringify(firstExp)
+  while (true) {
+    const [e1, en1] = exec(
+      exp, 
+      makeArgs([expDummy0, []], [expDummy1, []]), 
+      env,
+    )
 
-    if (firstStr === 'LLLLT') ret += 'T'
-    else if (firstStr === 'LLLLST') ret += 'S'
-    else if (firstStr === 'LLLLSST') ret += 'A'
-    else if (firstStr === 'LLLLSSST') ret += 'L'
+    // -> exp is equivalent to LLT
+    if (e1 === expDummy0) break
+
+    // A <exp> LLST
+    const [firstExp, firstEnv] = exec(
+      exp, 
+      makeArgs([expSelectFirst, []]), 
+      env
+    )
+
+    const [ex, _en] = exec(
+      firstExp, 
+      makeArgs(
+        [expT, []], 
+        [expS, []], 
+        [expA, []], 
+        [expL, []]
+      ), 
+      firstEnv,
+    )
+
+    if (ex === expT) ret += 'T'
+    else if (ex === expS) ret += 'S'
+    else if (ex === expA) ret += 'A'
+    else if (ex === expL) ret += 'L'
     else {
-      console.error(firstStr, firstEnv)
-      throw Error('oops' + firstStr)
+      console.error(stringify(ex), _en)
+      throw Error('oops')
     }
 
-    const [secondExp, secondEnv] = exec(parse1(selectSecond), [], env)
-    expStr = stringify(secondExp)
+    // A <exp> LLT
+    const [secondExp, secondEnv] = exec(
+      exp, 
+      makeArgs([expSelectSecond, []]), 
+      env,
+    )
+
+    exp = secondExp
     env = secondEnv
   }
 
